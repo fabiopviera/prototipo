@@ -1,0 +1,58 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(DT)
+library(writexl)
+library(readxl)
+```
+
+Input. {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+        fileInput("file1", "Choose File", accept = ".xlsx")#,
+        #checkboxInput("header", "Header", TRUE)
+
+
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+renderTable({
+      file <- input$file1
+      ext <- tools::file_ext(file$datapath)
+      
+      req(file)
+      validate(need(ext == "xlsx", "Please upload a csv file"))
+      
+      data_ <- read_xlsx(file$datapath)
+      data_
+    })
+```
+
+### Chart C
+
+```{r}
+renderDT({
+  datatable(read_xlsx(file$datapath), extensions = "Bottons", options = list(dom = 'Blfrtip',
+                                                          bottons = c('copy', 'csv', 'print'),
+                                                          lengthMenu = list(c(10,25,50,-1),c(10, 25, 50, "All"))))
+})
+```
+
