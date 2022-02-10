@@ -1,10 +1,11 @@
 ---
-title: "Untitled"
+title: "Protótipo DRG - Ortopedia"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
-    runtime: shiny
+     social: menu
+     source_code: embed    
+     vertical_layout: fill
+     runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -15,23 +16,30 @@ library(writexl)
 library(readxl)
 ```
 
-Input. {data-width=350}
------------------------------------------------------------------------
+Teste 1
+=====================================  
 
-### Chart A
+
+Inputs {.sidebar data-width=250}
+-----------------------------------------------------------------------
 
 ```{r}
 
-        fileInput("file1", "Choose File", accept = ".xlsx")#,
-        #checkboxInput("header", "Header", TRUE)
+fileInput("file1", "Select xlsx File to Import", accept = ".xlsx")
 
+actionButton("run_button", "Run Analysis", icon = icon("play"), style = "width:150px")
 
+br()
+br()
+
+actionButton("delete_button", "Clear Analysis", icon = icon("trash"), style = "width:150px")
 ```
 
-Column {data-width=650}
+Column {.tabset}
 -----------------------------------------------------------------------
 
-### Chart B
+
+### Entrada
 
 ```{r}
 renderTable({
@@ -41,14 +49,18 @@ renderTable({
       req(file)
       validate(need(ext == "xlsx", "Please upload a csv file"))
       
-      data_ <- read_xlsx(file$datapath)
-      data_
+      data_ <- read_xlsx(file$datapath) 
+      #%>%  datatable(options = list(pageLength = 25), rownames = FALSE)
+      data_ 
     })
 ```
 
-### Chart C
+
+
+### Saída
 
 ```{r}
+#eventReactive
 renderDT({
   datatable(read_xlsx(file$datapath), extensions = "Bottons", options = list(dom = 'Blfrtip',
                                                           bottons = c('copy', 'csv', 'print'),
