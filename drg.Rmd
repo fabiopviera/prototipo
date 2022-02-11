@@ -14,6 +14,8 @@ library(shiny)
 library(DT)
 library(writexl)
 library(readxl)
+library(rhandsontable)
+options(shiny.maxRequestSize = 10 * 1024^2)
 ```
 
 Teste 1
@@ -42,29 +44,85 @@ Column {.tabset}
 ### Entrada
 
 ```{r}
-renderTable({
-      file <- input$file1
-      ext <- tools::file_ext(file$datapath)
-      
-      req(file)
-      validate(need(ext == "xlsx", "Please upload a csv file"))
-      
-      data_ <- read_xlsx(file$datapath) 
-      #%>%  datatable(options = list(pageLength = 25), rownames = FALSE)
-      data_ 
+dataset <- eventReactive(input$file1,{
+     file <- input$file1
+     ext <- tools::file_ext(file$datapath)
+     req(file)
+     validate(need(ext == "xlsx", "Please upload a xlsx file"))
+     data_ <-  read_xlsx(file$datapath)
     })
+
+DT::renderDataTable({
+  dataset()
+})
 ```
 
+```{r}
+
+print('dddd')
+#renderTable({
+ # if(is.null(input$file1)){return()}
+ #else{
+ #    file <- input$file1
+ #    ext <- tools::file_ext(file$datapath)
+ #     req(file)
+ #    validate(need(ext == "xlsx", "Please upload a xlsx file"))
+ #    data_ <-  read_xlsx(file$datapath)
+
+# }
+
+ #  })
+
+
+```
+
+```{r}
+
+#renderRHandsontable({
+#  rhandsontable(data_, width = 600, height = 300)# %>%
+ # hot_col("factor_allow", allowInvalid = TRUE)
+#})
+```
 
 
 ### Saída
 
 ```{r}
-#eventReactive
+#eventReactive({
+
+
+
+#DRG <- NULL
+
+#for(i in 1:length(data_$idade)){
+ # if(data_$idade[i]<20 & data_$sexo[i]==1) {
+ #   DRG[i] <- "DRG1"
+ # }
+ # else if(data_$idade[i]<20 & data_$sexo[i]==0) {
+ #   DRG[i] <- "DRG2"
+ # }
+ # else if(data_$idade[i]>20 & data_$sexo[i]==1) {
+ #   DRG[i] <- "DRG3"
+ # }
+ # if(data_$idade[i]>20 & data_$sexo[i]==0) {
+ #   DRG[i] <- "DRG4"
+ #   }
+#}
+
+#data_$DRG <- DRG
+
 renderDT({
-  datatable(read_xlsx(file$datapath), extensions = "Bottons", options = list(dom = 'Blfrtip',
-                                                          bottons = c('copy', 'csv', 'print'),
-                                                          lengthMenu = list(c(10,25,50,-1),c(10, 25, 50, "All"))))
+  input$run_button
+      data(iris)
+datatable(iris, extensions = "Buttons", options = list(dom = 'Blfrtip',
+    buttons = c('copy', 'csv', 'excel' , 'pdf', 'print'), lengthMenu = list(c(15,25,50,-1),c(15, 25, 50, "All")),rownames = FALSE), filter = 'top')%>%
+  formatStyle(
+    'Species',backgroundColor = styleEqual(
+      unique(iris$Species), c('lightblue', 'lightgreen', 'lightpink')), fontWeight = 'bold'
+  )
+#
+#%>%
+ # formatStyle('Species',  color = 'red', backgroundColor = 'yellow', fontWeight = 'bold')
 })
 ```
 
