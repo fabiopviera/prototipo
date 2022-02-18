@@ -9,8 +9,8 @@ output:
 ---
 
 
+
 ```{r packages, include=FALSE}
-rm()
 library(flexdashboard)
 library(shiny)
 library(dplyr)
@@ -93,7 +93,55 @@ PROC19S81 <- data_proc %>% filter(value =="19S81") %>% select(code_proc)
 
 
 
-Teste 1
+Descritivo
+=====================================  
+
+
+Column 
+-----------------------------------------------------------------------
+
+### Aplicativo
+
+Antes de seguir para a aba ***DRG*** aqui são apresentados os passos de como utilizar o aplicativo para realizar os testes com os grupos DRG da especialidade de Ortopedia.
+
+ -  **Primeiro Passo:** Os dados para testes precisam estar em formato ***xlsx*** extensão do excel. Neste arquivo deve conter pelo menos as seguintes variáveis para que a lógica funcione:\
+***DGCAT:*** representa o diagnóstico principal;\
+***MDC:*** cápitulo da CID da especialidade ortopedia;\
+***PROCPRO1:*** procedimento principal;\
+***SECPROC1*** procedimento secundário; \
+***SECPROC2:*** mais um procedimento secundário;\
+***DGPRP1:*** diagnóstico secundário;\
+***IDADE:*** idade do contato assistencial.\
+
+-  **Segundo Passo:** Acesse a aba ***DRG*** na subaba **Entrada**, *click* no botão ***SELECIONE O ARQUIVO*** busque pelo arquivo desejado. Em seguida *click* no botão ***APRESENTAR OS DADOS***. 
+
+-  **Terceiro Passo:** Após o Segundo Passo acesse a subaba **Saída**, *click* no botão ***INICIAR AGRUPADOR***, o resultado é uma tabela com os contatos assistênciais agrupados em seus respectivos grupos DRGs. Esta tabela salva via download nas extensões ***.CSV*** e ***Excel***, bastando clicar no botão da extensão desejada.
+
+Na aba ***Análises***, é possível ter o quantitativo dos grupos DRGs via gráfico e tabela, acessando as subabas de interesse.
+
+
+
+
+Column 
+-----------------------------------------------------------------------
+
+### DRG  e Especialidade de Ortopedia
+
+O DRG é uma metodologia genérica que classifica os registros dos pacientes em grupos com:
+
+
+características clínicas semelhantes.
+
+perfis de consumo semelhantes. 
+
+Não há um sistema DRG universal, mas vários sistemas DRG com algoritmos variados para agrupar pacientes, dependendo da configuração clínica e administrativa para a qual eles são projetados. 
+
+A metodologia usada para criar esses algoritmos de agrupamento de registros de pacientes é praticamente a mesma, e é por isso que podemos referir o DRG como uma metodologia genérica.
+
+
+
+
+DRG 
 =====================================  
 
 
@@ -105,8 +153,9 @@ Column {.tabset .tabset-fade}
 
 
 ```{r}
-fileInput("file1", "SELECIONE OS DADOS .xlsx", accept = ".xlsx")
-actionButton("run_button","CARREGAR OS DADOS", icon = icon("play"), style = "width:250px",
+fileInput("file1", "SELECIONE OS DADOS .xlsx", accept = ".xlsx",
+  buttonLabel = "SELECIONE O ARQUIVO")
+actionButton("run_button","APRESENTAR OS DADOS", icon = icon("play"), style = "width:250px",
              class = "btn-danger")
 ```
 
@@ -366,9 +415,15 @@ table_out() %>% datatable(extensions = "Buttons", options = list(dom = 'Blfrtip'
 ```
 
 
+Análises 
+=====================================  
 
 
-### **Plots**
+Column {.tabset .tabset-fade}
+-------------------------------------------------------------------
+
+
+### **Gráficos**
 
 ```{r plot}
 plotly::renderPlotly({
