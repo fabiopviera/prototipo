@@ -1,0 +1,390 @@
+---
+title: "Protótipo DRG - Ortopedia"
+output: 
+  flexdashboard::flex_dashboard:
+     social: menu
+     source_code: embed    
+     vertical_layout: fill
+     runtime: shiny
+---
+
+
+```{r packages, include=FALSE}
+rm()
+library(flexdashboard)
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(plotly)
+library(readxl)
+library(DT)
+library(knitr)
+library(kableExtra)
+```
+
+```{r data}
+data_ <- read_xlsx("Dados_Teste.xlsx",sheet=2)
+data_proc <- read_xlsx("proc_diag_tabela.xlsx",sheet = 4)
+data_diag <- read_xlsx("proc_diag_tabela.xlsx",sheet = 5)
+data_name_DRG <- read_xlsx("proc_diag_tabela.xlsx",sheet = 3)
+data_name_DRG$DRG <- factor(data_name_DRG$DRG)
+
+################## Diagnósticos #################################
+DGCAT19M01 <- data_diag %>% filter(value =="19M01") %>% select(code_diag )
+
+DGCAT19M10 <- data_diag %>% filter(value =="19M10") %>% select(code_diag )
+DGCAT19M11 <- data_diag %>% filter(value =="19M11") %>% select(code_diag )
+DGCAT19M12 <- data_diag %>% filter(value =="19M12") %>% select(code_diag )
+DGCAT19M13 <- data_diag %>% filter(value =="19M13") %>% select(code_diag )
+DGCAT19M14 <- data_diag %>% filter(value =="19M14") %>% select(code_diag )
+
+DGCAT19M20 <- data_diag %>% filter(value =="19M20") %>% select(code_diag )
+DGCAT19M21 <- data_diag %>% filter(value =="19M21") %>% select(code_diag )
+DGCAT19M22 <- data_diag %>% filter(value =="19M22") %>% select(code_diag )
+DGCAT19M23 <- data_diag %>% filter(value =="19M23") %>% select(code_diag )
+DGCAT19M24 <- data_diag %>% filter(value =="19M24") %>% select(code_diag )
+
+DGCAT19M50 <- data_diag %>% filter(value =="19M00") %>% select(code_diag )
+DGCAT19M51 <- data_diag %>% filter(value =="19M51") %>% select(code_diag )
+
+################## Procedimentos #################################
+PROC19N23 <- data_diag %>% filter(value =="19N23") %>% select(code_diag )
+
+
+PROC19S01 <- data_proc %>% filter(value =="19S01") %>% select(code_proc)
+PROC19S02 <- data_proc %>% filter(value =="19S02") %>% select(code_proc)
+PROC19S03 <- data_proc %>% filter(value =="19S03") %>% select(code_proc)
+PROC19S04 <- data_proc %>% filter(value =="19S04") %>% select(code_proc)
+PROC19S05 <- data_proc %>% filter(value =="19S05") %>% select(code_proc)
+PROC19S06 <- data_proc %>% filter(value =="19S06") %>% select(code_proc)
+
+PROC19S10 <- data_proc %>% filter(value =="19S10") %>% select(code_proc)
+PROC19S11 <- data_proc %>% filter(value =="19S11") %>% select(code_proc)
+#PROC19S12 <- data_proc %>% filter(value =="19S12") %>% select(code_proc)
+PROC19S13 <- data_proc %>% filter(value =="19S13") %>% select(code_proc)
+PROC19S14 <- data_proc %>% filter(value =="19S14") %>% select(code_proc)
+PROC19S15 <- data_proc %>% filter(value =="19S15") %>% select(code_proc)
+PROC19S16 <- data_proc %>% filter(value =="19S16") %>% select(code_proc)
+PROC19S17 <- data_proc %>% filter(value =="19S17") %>% select(code_proc)
+PROC19S18 <- data_proc %>% filter(value =="19S18") %>% select(code_proc)
+
+PROC19S20 <- data_proc %>% filter(value =="19S20") %>% select(code_proc)
+PROC19S21 <- data_proc %>% filter(value =="19S21") %>% select(code_proc)
+PROC19S22 <- data_proc %>% filter(value =="19S22") %>% select(code_proc)
+PROC19S23 <- data_proc %>% filter(value =="19S23") %>% select(code_proc)
+PROC19S24 <- data_proc %>% filter(value =="19S24") %>% select(code_proc)
+PROC19S25 <- data_proc %>% filter(value =="19S25") %>% select(code_proc)
+PROC19S26 <- data_proc %>% filter(value =="19S26") %>% select(code_proc)
+PROC19S27 <- data_proc %>% filter(value =="19S27") %>% select(code_proc)
+PROC19S28 <- data_proc %>% filter(value =="19S28") %>% select(code_proc)
+PROC19S29 <- data_proc %>% filter(value =="19S29") %>% select(code_proc)
+PROC19S30 <- data_proc %>% filter(value =="19S30") %>% select(code_proc)
+PROC19S31 <- data_proc %>% filter(value =="19S31") %>% select(code_proc)
+
+PROC19S40 <- data_proc %>% filter(value =="19S40") %>% select(code_proc)
+PROC19S41 <- data_proc %>% filter(value =="19S41") %>% select(code_proc)
+PROC19S42 <- data_proc %>% filter(value =="19S42") %>% select(code_proc)
+PROC19S43 <- data_proc %>% filter(value =="19S43") %>% select(code_proc)
+
+PROC19S80 <- data_proc %>% filter(value =="19S80") %>% select(code_proc)
+PROC19S81 <- data_proc %>% filter(value =="19S81") %>% select(code_proc)
+```
+
+
+
+Teste 1
+=====================================  
+
+
+Column {.tabset .tabset-fade}
+-------------------------------------------------------------------
+
+
+### **Entrada**
+
+
+```{r}
+fileInput("file1", "SELECIONE OS DADOS .xlsx", accept = ".xlsx")
+actionButton("run_button","CARREGAR OS DADOS", icon = icon("play"), style = "width:250px",
+             class = "btn-danger")
+```
+
+```{r entrada}
+dataset <- eventReactive(input$file1, {
+     file <- input$file1
+     if(is.null(file)){return()} 
+     ext <- tools::file_ext(file$datapath)
+     req(file)
+     validate(need(ext == "xlsx", "Please upload a xlsx file"))
+     read_xlsx(file$datapath,sheet=2)
+    })
+
+
+
+table_data <- eventReactive(input$run_button, {
+  x = dataset()
+ as.data.frame(x)
+})
+
+renderDataTable({
+  req(table_data())
+table_data() %>% 
+  DT::datatable(options = list(pageLength = 25), rownames = FALSE)
+})
+```
+
+
+### **Saída**
+
+
+
+```{r botao2}
+actionButton("run_agrupar","INICIAR AGRUPADOR", icon = icon("play"), style = "width:250px",
+             class="btn-success")
+```
+
+
+
+```{r logica}
+
+table_out <- eventReactive(input$run_agrupar, {
+ 
+req(table_data())
+data1_ <- table_data()
+
+
+
+DRG <- NULL
+#eventReactive({
+for(i in 1:length(data1_$IDADE)){
+
+#REGRA 1 está no final do código
+  
+  # REGRA 2
+  if( (data1_$MDC[i] == 19) & (data1_$PROCPRO1[i] %in% PROC19S40$code_proc) ) {
+    DRG[i] <- "1901"
+  }
+  # REGRA 3
+  else if( (data1_$MDC[i] ==19) & (data1_$PROCPRO1[3] %in% PROC19S41$code_proc) & (data1_$SECPROC1[i] %in% PROC19S42$code_proc) & (data1_$SECPROC2[i] %in% PROC19S43$code_proc) ) {
+    DRG[i] <- "1902"
+  }
+  # REGRA 4
+  else if( (data1_$MDC[i] ==19 &data1_$PROCPRO1[i] %in% PROC19S41$code_proc & data1_$SECPROC1[i] %in% PROC19S42$code_proc)) {
+    DRG[i] <- "1903"
+  }
+  # REGRA 5
+  else if( (data1_$MDC[i] ==19 &data1_$PROCPRO1[i] %in% PROC19S42$code_proc & data1_$SECPROC1[i] %in% PROC19S43$code_proc)) {
+    DRG[i] <- "1903"
+  }  
+  # REGRA 6
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M50$code_diag  & data1_$PROCPRO1[i] %in% PROC19S30$code_proc & data1_$IDADE[i] < 11) {
+    DRG[i] <- "1904"
+  }
+  # REGRA 7
+  else if(data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M51$code_diag & data1_$PROCPRO1[i] %in% PROC19S31$code_proc & data1_$IDADE[i] < 11) {
+    DRG[i] <- "1905"
+  }
+  # REGRA 8 E REGRA 9
+  else if((data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M50$code_diag  & data1_$IDADE[i] < 11) ) {
+    DRG[i] <- "1906"
+  }
+  # REGRA 9
+  else if( (data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M51$code_diag & data1_$IDADE[i] < 11) ) {
+    DRG[i] <- "1906"
+  }
+  # REGRA 10
+  else if(data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M01$code_diag  & data1_$PROCPRO1[i] %in% PROC19S01$code_proc & data1_$SECPROC1[i] %in% PROC19S02$code_proc) {
+    DRG[i] <- "1907"
+  }
+  # REGRA 11
+  else if(data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M01$code_diag  & data1_$PROCPRO1[i] %in% PROC19S01$code_proc) {
+    DRG[i] <- "1908"
+  }
+  # REGRA 12
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M01$code_diag  & data1_$PROCPRO1[i] %in% PROC19S03$code_proc) {
+    DRG[i] <- "1909"
+  }
+  # REGRA 13
+  else if(data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M01$code_diag  & data1_$PROCPRO1[i] %in% PROC19S04$code_proc) {
+    DRG[i] <- "1910"
+  }
+  # REGRA 14
+  else if(data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M01$code_diag  & data1_$PROCPRO1[i] %in% PROC19S05$code_proc) {
+    DRG[i] <- "1911"
+  }
+  # REGRA 15
+  else if(data1_$MDC[i] ==19 &data1_$DGCAT[i] %in% DGCAT19M01$code_diag  & data1_$PROCPRO1[i] %in% PROC19S06$code_proc) {
+    DRG[i] <- "1912"
+  }
+  # REGRA 16
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M01$code_diag ) {
+    DRG[i] <- "1913"
+  }
+  # REGRA 17 
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M10$code_diag  & data1_$PROCPRO1[i] %in% PROC19S10$code_proc & data1_$SECPROC1[i] %in% PROC19S80$code_proc) {
+    DRG[i] <- "1914"
+  }
+  # REGRA 18
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M10$code_diag  & data1_$PROCPRO1[i] %in% PROC19S10$code_proc) {
+    DRG[i] <- "1915"
+  }
+  # REGRA 19
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M10$code_diag  & data1_$PROCPRO1[i] %in% PROC19S11$code_proc) {
+    DRG[i] <- "1916"
+  }
+  # REGRA 20
+ # else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M11 & data1_$PROCPRO1[i] %in% PROC19S10 & data1_$SECPROC1[i] %in% PROC19S12) {
+  #  DRG[i] <- "1917"
+  #}
+  # REGRA 21
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M11$code_diag  & data1_$PROCPRO1[i] %in% PROC19S10$code_proc) {
+    DRG[i] <- "1918"
+  }
+  # REGRA 22
+  else if(data1_$MDC[i] ==19 & data1_$PROCPRO1[i] %in% PROC19S13$code_proc) {
+    DRG[i] <- "1919"
+  }
+  # REGRA 23
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M12$code_diag  & data1_$PROCPRO1[i] %in% PROC19S14$code_proc) {
+    DRG[i] <- "1920"
+  }
+  # REGRA 24
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M12$code_diag ) {
+    DRG[i] <- "1921"
+  }
+  # REGRA 25
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M13$code_diag  & data1_$PROCPRO1[i] %in% PROC19S15$code_proc & data1_$SECPROC1[i] %in% PROC19S81$code_proc) {
+    DRG[i] <- "1922"
+  }
+  # REGRA 26
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M13$code_diag  & data1_$PROCPRO1[i] %in% PROC19S15$code_proc) {
+    DRG[i] <- "1923"
+  }
+  # REGRA 27
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M13$code_diag ) {
+    DRG[i] <- "1921"
+  }
+  # REGRA 28
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M14$code_diag  & data1_$PROCPRO1[i] %in% PROC19S16$code_proc) {
+    DRG[i] <- "1924"
+  } 
+  # REGRA 29
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M14$code_diag  & data1_$PROCPRO1[i] %in% PROC19S17$code_proc) {
+    DRG[i] <- "1925"
+  } 
+  # REGRA 30
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M14$code_diag  & data1_$PROCPRO1[i] %in% PROC19S18$code_proc) {
+    DRG[i] <- "1926"
+  } 
+  # REGRA 31
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M14$code_diag ) {
+    DRG[i] <- "1927"
+  } 
+  # REGRA 32
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M20$code_diag  & data1_$PROCPRO1[i] %in% PROC19S20$code_proc) {
+    DRG[i] <- "1928"
+  } 
+  # REGRA 33
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M20$code_diag  & data1_$PROCPRO1[i] %in% PROC19S21$code_proc) {
+    DRG[i] <- "1929"
+  } 
+  # REGRA 34
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M20$code_diag  & data1_$PROCPRO1[i] %in% PROC19S22$code_proc) {
+    DRG[i] <- "1930"
+  } 
+  # REGRA 35
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M20$code_diag ) {
+    DRG[i] <- "1931"
+  } 
+  # REGRA 36
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M21$code_diag  & data1_$PROCPRO1[i] %in% PROC19S23$code_proc) {
+    DRG[i] <- "1932"
+  } 
+  # REGRA 37
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M21$code_diag ) {
+    DRG[i] <- "1933"
+  } 
+  # REGRA 38
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M11$code_diag  & data1_$PROCPRO1[i] %in% PROC19S24$code_proc) {
+    DRG[i] <- "1934"
+  } 
+  # REGRA 39
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M22$code_diag & data1_$PROCPRO1[i] %in% PROC19S25$code_proc) {
+    DRG[i] <- "1935"
+  } 
+  # REGRA 40
+  else if(data1_$MDC[i] ==19  & data1_$PROCPRO1[i] %in% PROC19S26$code_proc) {
+    DRG[i] <- "1936"
+  } 
+  # REGRA 41
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M23$code_diag  & data1_$PROCPRO1[i] %in% PROC19S27$code_proc) {
+    DRG[i] <- "1937"
+  } 
+  # REGRA 42
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M24$code_diag  & data1_$PROCPRO1[i] %in% PROC19S27$code_proc & data1_$DGPROP1[i] %in% PROC19N23$code_diag) {
+    DRG[i] <- "1937"
+  } 
+  # REGRA 43
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M24$code_diag  & data1_$PROCPRO1[i] %in% PROC19S28$code_proc) {
+    DRG[i] <- "1938"
+  } 
+  # REGRA 44
+  else if(data1_$MDC[i] ==19  & data1_$DGCAT[i] %in% DGCAT19M24$code_diag  & data1_$PROCPRO1[i] %in% PROC19S29$code_proc) {
+    DRG[i] <- "1939"
+  } 
+  # REGRA 45
+  else if(data1_$MDC[i] ==19 & data1_$DGCAT[i] %in% DGCAT19M24$code_diag ) {
+    DRG[i] <- "1940"
+  } 
+   #REGRA 46
+  else if(data1_$MDC[i] ==19) {
+    DRG[i] <- "1941"
+  } 
+  # REGRA 47
+  else {
+    DRG[i] <- "2602"
+  }
+}
+
+data1_$DRG <- DRG
+
+x_out = data1_
+as.data.frame(x_out)
+
+})
+```
+
+
+
+```{r saida}
+renderDataTable({
+  req(table_out())
+table_out() %>% datatable(extensions = "Buttons", options = list(dom = 'Blfrtip',
+    buttons = c('csv', 'excel'), lengthMenu = list(c(15,25,50,-1),c(15, 25, 50, "All")),rownames = FALSE), filter = 'top')
+})
+```
+
+
+
+
+### **Plots**
+
+```{r plot}
+plotly::renderPlotly({
+  req(table_out())
+  plotly::ggplotly( 
+table_out() %>% group_by(DRG) %>% summarise(n_=n(),.groups = 'drop')%>% arrange(desc(n_)) %>%
+  left_join(data_name_DRG,by="DRG") %>%
+  ggplot(aes(x=DRG, y=n_, text=DRG_label) )+
+  geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
+    coord_flip()+
+    labs(x = "GRUPOS DRG", y = "FREQUÊNCIA", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    ),tooltip = c("text", "n_"))
+})
+```
+
