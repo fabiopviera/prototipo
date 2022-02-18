@@ -420,14 +420,26 @@ Análises
 Column {.tabset .tabset-fade}
 -------------------------------------------------------------------
 
+```{r botao3}
+actionButton("run_analise","ANALISAR", icon = icon("play"), style = "width:250px", class="btn-info")
+```
+
 
 ### **Gráficos**
 
-```{r plot}
-plotly::renderPlotly({
+
+
+```{r plot1}
+data_analise <- eventReactive(input$run_analise,{
   req(table_out())
+  x_analise = table_out()
+as.data.frame(x_analise)
+})
+
+plotly::renderPlotly({
+  req(data_analise())
   plotly::ggplotly( 
-table_out() %>% group_by(DRG) %>% summarise(n_=n(),.groups = 'drop')%>% arrange(desc(n_)) %>%
+data_analise() %>% group_by(DRG) %>% summarise(n_=n(),.groups = 'drop')%>% arrange(desc(n_)) %>%
   left_join(data_name_DRG,by="DRG") %>%
   ggplot(aes(x=DRG, y=n_, text=DRG_label) )+
   geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
@@ -439,5 +451,18 @@ table_out() %>% group_by(DRG) %>% summarise(n_=n(),.groups = 'drop')%>% arrange(
           axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
     ),tooltip = c("text", "n_"))
 })
+plot
 ```
 
+Column {.tabset .tabset-fade}
+-------------------------------------------------------------------
+
+
+```{r table1}
+renderDataTable({
+  req(data_analise())
+data_analise() %>%  group_by(DRG) %>% summarise(n_=n(),.groups = 'drop')%>% arrange(desc(n_)) %>% mutate(FREQ=n_) %>%
+  left_join(data_name_DRG,by="DRG") %>% select(DRG,FREQ,DRG_label) %>% datatable(extensions = "Buttons", options = list(dom = 'Blfrtip',
+    buttons = c('csv', 'excel'), lengthMenu = list(c(15,25,50,-1),c(15, 25, 50, "All")),rownames = FALSE), filter = 'top')
+})
+```
