@@ -1,0 +1,14 @@
+name: ORTOPDIA
+title: PROTOTIPO ORTOPEDIA
+username:
+account: fpshiny2021
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5681172
+bundleId: 5592349
+url: https://fpshiny2021.shinyapps.io/ORTOPDIA/
+when: 1645153341.31249
+lastSyncTime: 1645153341.31249
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: Dados_Teste.xlsx

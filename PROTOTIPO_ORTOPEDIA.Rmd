@@ -5,7 +5,7 @@ output:
      social: menu
      source_code: embed    
      vertical_layout: fill
-     runtime: shiny
+runtime: shiny
 ---
 
 
@@ -24,7 +24,6 @@ library(kableExtra)
 ```
 
 ```{r data}
-data_ <- read_xlsx("Dados_Teste.xlsx",sheet=2)
 data_proc <- read_xlsx("proc_diag_tabela.xlsx",sheet = 4)
 data_diag <- read_xlsx("proc_diag_tabela.xlsx",sheet = 5)
 data_name_DRG <- read_xlsx("proc_diag_tabela.xlsx",sheet = 3)
@@ -106,7 +105,7 @@ Antes de seguir para a aba ***DRG*** aqui são apresentados os passos de como ut
 
  -  **Primeiro Passo:** Os dados para testes precisam estar em formato ***xlsx*** extensão do excel. Neste arquivo deve conter pelo menos as seguintes variáveis para que a lógica funcione:\
 ***DGCAT:*** representa o diagnóstico principal;\
-***MDC:*** cápitulo da CID da especialidade ortopedia;\
+***MDC:*** capítulo da CID da especialidade ortopedia;\
 ***PROCPRO1:*** procedimento principal;\
 ***SECPROC1*** procedimento secundário; \
 ***SECPROC2:*** mais um procedimento secundário;\
@@ -118,7 +117,6 @@ Antes de seguir para a aba ***DRG*** aqui são apresentados os passos de como ut
 -  **Terceiro Passo:** Após o Segundo Passo acesse a subaba **Saída**, *click* no botão ***INICIAR AGRUPADOR***, o resultado é uma tabela com os contatos assistênciais agrupados em seus respectivos grupos DRGs. Esta tabela salva via download nas extensões ***.CSV*** e ***Excel***, bastando clicar no botão da extensão desejada.
 
 Na aba ***Análises***, é possível ter o quantitativo dos grupos DRGs via gráfico e tabela, acessando as subabas de interesse.
-
 
 
 
@@ -166,7 +164,7 @@ dataset <- eventReactive(input$file1, {
      ext <- tools::file_ext(file$datapath)
      req(file)
      validate(need(ext == "xlsx", "Please upload a xlsx file"))
-     read_xlsx(file$datapath,sheet=2)
+     read_xlsx(file$datapath)
     })
 
 
